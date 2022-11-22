@@ -1,51 +1,53 @@
 [PLAYER]
-texture_name = "resources/Player.png"
+texture_name = "resources/textures/Player.png"
 speed = 50
 damage = 3
 
 [TILE]
 name = "empty"
-texture_name = "resources/Clear.png"
+texture_name = "resources/textures/Clear.png"
 difficulty = 1
 collision = 0
 
 [TILE]
 name = "base"
-texture_name = "resources/Base.png"
+texture_name = "resources/textures/Base.png"
 difficulty = 1
 collision = 0
 
 [TILE]
 name = "spawner"
-texture_name = "resources/Spawner.png"
+texture_name = "resources/textures/Spawner.png"
 difficulty = 1
 collision = 0
 
 [TILE]
 name = "stonewall"
-texture_name = "resources/StoneWall.png"
+texture_name = "resources/textures/StoneWall.png"
 difficulty = 10
 collision = 1
 
 [PLACEABLE_TILE]
-texture_name = "resources/StoneWall_Preview.png"
+texture_name = "resources/textures/StoneWall_Preview.png"
 cost = 5
 tile_name = "stonewall"
 
 [PLACEABLE_TURRET]
-texture_name = "resources/GreenTurret.png"
+texture_name = "resources/textures/GreenTurret.png"
 cost = 10
 t_range = 50
 damage = 10
 fire_rate = .5
 hardness = 15
-turret_texture_name = "resources/GreenTurret.png"
-laser_thickness = 3
+turret_texture_name = "resources/textures/GreenTurret.png"
+laser_thickness = 1
 laser_color = (0, 255, 0)
 laser_show_time = .2
+laser_sound = "resources/sounds/laserShoot.wav"
+
 
 [ENEMY]
-texture_name = "resources/Skeleton.png"
+texture_name = "resources/textures/Skeleton.png"
 cost = 1
 health = 50
 speed = 3
@@ -53,7 +55,7 @@ damage = 2
 value = 1
 
 [ENEMY]
-texture_name = "resources/Skeleton.png"
+texture_name = "resources/textures/Skeleton.png"
 cost = 3
 health = 200
 speed = 2

@@ -55,3 +55,7 @@ class WaveManager:
             if i[0] <= value:
                 return_list.append(i)
         return return_list
+
+    def reset(self):
+        self.wave_number = 0
+        self.wave_spawn_monster_list = []

@@ -1,4 +1,5 @@
-from player import Player
+from SoundManager import SoundManager
+from Player import Player
 from ScreenManager import ScreenManager
 from TowerDefence import TileManager, PlaceableTile
 from Turret import Turret
@@ -52,7 +53,7 @@ def parse_placeable_tile(lines, i, sm: ScreenManager, tm:TileManager):
     return PlaceableTile(texture_name, cost, tm.get_tile(tile_name))
 
 
-def parse_placeable_turret(lines, i, sm: ScreenManager):
+def parse_placeable_turret(lines, i, sm: ScreenManager, sound_m: SoundManager):
     texture_name = parse_string(lines[i+1])
     cost = parse_int(lines[i+2])
     t_range = parse_float(lines[i+3])
@@ -63,10 +64,12 @@ def parse_placeable_turret(lines, i, sm: ScreenManager):
     laser_thickness = parse_int(lines[i+8])
     laser_color = parse_color(lines[i+9])
     laser_show_time = parse_float(lines[i+10])
+    laser_sound = parse_string(lines[i + 11])
 
     sm.load_pixel_texture(texture_name, texture_name, True)
     sm.load_pixel_texture(turret_texture_name, turret_texture_name, True)
-    turret = Turret(-1, [0, 0], t_range, damage, fire_rate, hardness, None, turret_texture_name)
+    sound_m.load_sound(laser_sound, laser_sound)
+    turret = Turret(-1, [0, 0], t_range, damage, fire_rate, hardness, None, turret_texture_name, laser_sound)
     turret.set_drawing_vars(laser_thickness, laser_color, laser_show_time)
     return PlaceableTile(texture_name, cost, turret)
 
@@ -83,7 +86,7 @@ def parse_enemy(lines, i, sm: ScreenManager):
     return [cost, health, speed, damage, value, texture_name]
 
 
-def load_game(stat, sm: ScreenManager):
+def load_game(stat, sm: ScreenManager, sound_m: SoundManager):
     main_player = None
     tiles_manager = TileManager()
     placeable = []
@@ -100,7 +103,7 @@ def load_game(stat, sm: ScreenManager):
             if "[PLACEABLE_TILE]" in lines[index]:
                 placeable.append(parse_placeable_tile(lines, index, sm, tiles_manager))
             if "[PLACEABLE_TURRET]" in lines[index]:
-                placeable.append(parse_placeable_turret(lines, index, sm))
+                placeable.append(parse_placeable_turret(lines, index, sm, sound_m))
             if "[ENEMY]" in lines[index]:
                 enemies.append(parse_enemy(lines, index, sm))
 

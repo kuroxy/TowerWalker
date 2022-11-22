@@ -7,6 +7,11 @@ class ScreenManager:
         self.pixel_size = pixel_size
         self.screen_surface = screen_surface
 
+        self.pixel_surface = pygame.Surface([int(self.window_size[0]/self.pixel_size), int(self.window_size[1]/self.pixel_size)])
+        self.pixel_surface.set_colorkey((0, 0, 0))
+
+        self.fill_surface = pygame.Surface([int(self.window_size[0]), int(self.window_size[1])], pygame.SRCALPHA)
+
         self.textures = {}
         self.scaled_textures = {}
 
@@ -45,14 +50,27 @@ class ScreenManager:
     def fill(self, color: tuple[int, int, int]):
         self.screen_surface.fill(color)
 
+    def fill_with_opacity(self, color: tuple[int, int, int], opacity: int):
+        self.fill_surface.fill([color[0], color[1], color[2], opacity])
+        self.screen_surface.blit(self.fill_surface, [0, 0])
+
     def screen_to_pixel(self, position: tuple[int, int]) -> list[int, int]:
         return [int(position[0] / self.pixel_size), int(position[1] / self.pixel_size)]
 
     def pixel_line(self, color, line, width):
-        pygame.draw.line(self.screen_surface, color, [line[0]*self.pixel_size, line[1]*self.pixel_size],[line[2]*self.pixel_size, line[3]*self.pixel_size], width)
+        self.pixel_surface.fill((0, 0, 0))
+        pygame.draw.line(self.pixel_surface, color, [line[0], line[1]], [line[2], line[3]], width)
+        surf = pygame.transform.scale(self.pixel_surface, self.window_size)
+        self.screen_surface.blit(surf, (0, 0))
 
     def pixel_micro_font(self, x, y, text, color):
         if not self.micro_font:
             return
         rendered_text = self.micro_font.render(text, True, color)
         self.screen_surface.blit(rendered_text, (x*self.pixel_size, y*self.pixel_size))
+
+    def normal_micro_font(self, x, y, text, color):
+        if not self.micro_font:
+            return
+        rendered_text = self.micro_font.render(text, True, color)
+        self.screen_surface.blit(rendered_text, (x, y))

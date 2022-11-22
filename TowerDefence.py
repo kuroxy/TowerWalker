@@ -2,6 +2,7 @@ import random
 
 from Enemy import Enemy
 from ScreenManager import ScreenManager
+from SoundManager import SoundManager
 from Turret import Turret
 from WaveManager import WaveManager
 
@@ -131,12 +132,14 @@ class MapManager:
         """
         self.damage_map[y][x] -= damage
 
-    def update_damage_map(self):
+    def update_damage_map(self, sound_m):
         """ updates the damage map removes tiles that are completely damaged
         """
         for y in range(self.map_size[1]):
             for x in range(self.map_size[0]):
                 if self.damage_map[y][x] <= 0:
+                    if self.map[y][x] != self.tm.get_tile("empty"):
+                        sound_m.play_sound("break_block")
                     self.map[y][x] = self.tm.get_tile("empty")
                     self.damage_map[y][x] = self.tm.get_tile("empty").difficulty
 
@@ -184,8 +187,9 @@ class PlaceableTile:
 
 
 class TowerDefence:
-    def __init__(self, x_size: int, y_size: int, tm: TileManager, placeables: list[PlaceableTile], wave_enemies) -> None:
+    def __init__(self, x_size: int, y_size: int, tm: TileManager, placeables: list[PlaceableTile], wave_enemies, sound_m: SoundManager) -> None:
         self.tm: TileManager = tm
+        self.sound_m: SoundManager = sound_m
 
         # tiles map with type of tiles
         self.map: MapManager = MapManager(x_size, y_size, self.tm)
@@ -200,13 +204,14 @@ class TowerDefence:
         self.generate_utilities()  # setting random positions for the spawner and the base
 
         # objects
-        self.wave_manager = WaveManager(self, wave_enemies)
+        self.wave_manager: WaveManager = WaveManager(self, wave_enemies)
         self.enemies: list[Enemy] = []
-        self.turret_custom_id = 0
+        self.turret_custom_id: int = 0
         self.turrets: list[Turret] = []
 
         # --- player attributes ---
-        self.player_currency: int = 34
+        self.player_currency: int = 0
+        self.total_player_currency = self.player_currency
 
         self.placeable_tile_list_index = 0
         self.placeable_tile_list = []
@@ -217,6 +222,17 @@ class TowerDefence:
             elif isinstance(placeable.type, Turret):
                 placeable.type.td = self
                 self.placeable_tile_list.append(placeable)
+
+        self.reset()
+
+    def reset(self):
+        self.player_currency = 25
+        self.total_player_currency = self.player_currency
+        self.wave_manager.reset()
+        self.map.fill_map("stonewall")
+        self.base_health = 100
+        self.generate_utilities()
+        self.enemies = []
 
     def generate_utilities(self) -> None:
         """ creating and setting the spawner_pos and base_pos to a random position
@@ -264,10 +280,12 @@ class TowerDefence:
             return
 
         if isinstance(selected.type, Tile):
+            self.sound_m.play_sound("place_block")
             self.map.set_tile(x, y, selected.type)
         elif isinstance(selected.type, Turret):
+            self.sound_m.play_sound("place_turret")
             self.place_turret(x, y, selected.type)
-        self.player_currency -= selected.cost
+        self.player_currency -= int(selected.cost)
 
     def change_placeable(self, amount):
         self.placeable_tile_list_index += amount
@@ -287,17 +305,17 @@ class TowerDefence:
 
                 self.turrets.remove(turret)
 
-
         # update turrets
         for turret in self.turrets:
-            turret.update(dt)
+            turret.update(dt, self.sound_m)
 
         # update enemies
         for enemy in self.enemies:
             enemy.update(dt)
 
             if enemy.health <= 0:
-                self.player_currency += enemy.value
+                self.player_currency += int(enemy.value)
+                self.total_player_currency += int(enemy.value)
                 self.enemies.remove(enemy)
 
         # damage base
@@ -305,11 +323,14 @@ class TowerDefence:
             if enemy.old_objective == self.base_pos:
                 self.base_health -= enemy.damage
                 self.enemies.remove(enemy)
-                print(self.base_health)
+                self.sound_m.play_sound("damage_base")
 
         # update map
-        self.map.update_damage_map()
+        self.map.update_damage_map(self.sound_m)
         self.calculate_pathfinding()
+
+        if self.base_health <= 0:
+            return True
 
     def draw(self, sm: ScreenManager, debug: bool = False):
         # drawing the map
@@ -347,6 +368,19 @@ class TowerDefence:
             color = (255, 0, 0) if timeleft % 2 == 0 else (127, 0, 0)
             sm.pixel_micro_font(7 * 10, self.map.map_size[1] * 10 + 1, f"({timeleft})", color)
 
+        # base health
+        sm.pixel_blit(9 * 10, self.map.map_size[1] * 10-1, self.tm.get_tile("base").texture_name)
+        color = (165, 24, 24)
+        if self.base_health > 90:
+            color = (53, 178, 58)
+        elif self.base_health > 75:
+            color = (77, 212, 100)
+        elif self.base_health > 50:
+            color = (247, 196, 57)
+        elif self.base_health > 25:
+            color = (255, 80, 54)
+
+        sm.pixel_micro_font(10*10, self.map.map_size[1] * 10 + 1, str(int(self.base_health)), color)
         # diamond image + player currency amount
         sm.pixel_blit((self.map.map_size[0]-3)*10, self.map.map_size[1]*10, "currency")  # money
         sm.pixel_micro_font((self.map.map_size[0]-2)*10+1, self.map.map_size[1]*10+1, str(self.player_currency).zfill(3), (95, 183, 243))

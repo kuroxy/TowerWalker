@@ -59,7 +59,7 @@ class Player:
 
         # --- breaking tiles ---
         if mouse_event == 1 and self.selected_tile is not None:
-            td.map.damage_tile(self.selected_tile_position[0],self.selected_tile_position[1], self.damage)
+            td.map.damage_tile(self.selected_tile_position[0], self.selected_tile_position[1], self.damage)
         if mouse_event == 3:
             td.place_placeable(self.selected_tile_position[0], self.selected_tile_position[1])
         if mouse_event == 4:
@@ -97,6 +97,16 @@ class Player:
             if tile is not None and tile.collision:
                 self.collision_response(position[0]*self.tile_size, position[1]*self.tile_size)
                 return
+
+        if self.position[0] < 0:
+            self.position[0] = 0
+        elif self.position[0] > (mm.map_size[0]-1)*10:
+            self.position[0] = (mm.map_size[0]-1)*10
+
+        if self.position[1] < 0:
+            self.position[1] = 0
+        elif self.position[1] > (mm.map_size[1]-1)*10:
+            self.position[1] = (mm.map_size[1]-1)*10
 
     def collision_response(self, x, y):
         vector_x = self.position[0] - x
