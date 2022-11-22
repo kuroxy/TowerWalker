@@ -1,8 +1,8 @@
 import pygame
-import os
 from player import Player
 from TowerDefence import *
-from ScreenManager import ScreenManager
+from player import Player
+from load_game_parameters import load_game
 
 
 # -------------------Pygame-------------------------
@@ -19,23 +19,9 @@ clock = pygame.time.Clock()
 
 
 # -------------- Load Textures ---------------
-# ---player---
-screen_manager.load_pixel_texture("resources/player.png", "player", True)
-
-# ---tiles---
-screen_manager.load_pixel_texture("resources/Base.png", "base", True)
-screen_manager.load_pixel_texture("resources/Spawner.png", "spawner", True)
-screen_manager.load_pixel_texture("resources/StoneWall.png", "stonewall", True)
-screen_manager.load_pixel_texture("resources/Clear.png", "empty", True)
-
-screen_manager.load_pixel_texture("resources/StoneWall_Preview.png", "stonewall_preview", True)
-# ---enemy---
-screen_manager.load_pixel_texture("resources/Skeleton.png", "skeleton", True)
-
-# --- turret ---
-screen_manager.load_pixel_texture("resources/Turret.png", "turret", True)
 
 # ---utility---
+screen_manager.load_pixel_texture("resources/Ghost.png", "ghost", True)
 screen_manager.load_pixel_texture("resources/Arrows.png", "arrows", True)
 screen_manager.load_pixel_texture("resources/Select.png", "select", True)
 screen_manager.load_pixel_texture("resources/Currency.png", "currency", True)
@@ -45,8 +31,11 @@ screen_manager.load_pixel_texture("resources/Background.png", "background", True
 screen_manager.load_micro_font("resources/Micro_Chat.ttf")
 
 # -----------------Game-------------------------
-mainPlayer = Player()
-towerDef = TowerDefence(int(GAME_SIZE[0]/10), int(GAME_SIZE[1]/10)-1)
+# main_player, tiles_manager, placeable, enemies
+parameters = load_game("resources/stats.txt", screen_manager)
+
+mainPlayer = parameters[0]
+towerDef = TowerDefence(int(GAME_SIZE[0]/10), int(GAME_SIZE[1]/10)-1, parameters[1], parameters[2], parameters[3])
 
 towerDef.calculate_pathfinding()
 
@@ -70,7 +59,7 @@ while True:
     mouse_position = pygame.mouse.get_pos()
 
     if keys[pygame.K_SPACE] and not space_hold:
-        towerDef.add_enemy()
+        towerDef.wave_manager.time_between_waves_timer = 0
         space_hold = True
     elif not keys[pygame.K_SPACE]:
         space_hold = False

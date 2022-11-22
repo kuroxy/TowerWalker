@@ -1,20 +1,22 @@
 import math
 import random
+
 from ScreenManager import ScreenManager
 
 
 class Enemy:
-    def __init__(self, map_man, spawn_x: int, spawn_y: int, health, texture_name):
-        self.map = map_man
+    def __init__(self, mm, spawn_x: int, spawn_y: int, texture_name):
+        self.map = mm
         self.texture_name = texture_name
 
         # --- Enemy stats ---
         self.position: list[float, float] = [0, 0]
 
-        self.health = health
+        self.health = 100
         self.speed: float = 1
         self.damage: float = 5
 
+        self.value = 1
         # --- movement ----
         self.progress: float = 0
 
@@ -22,6 +24,13 @@ class Enemy:
         self.new_objective: list[int, int] = [spawn_x, spawn_y]
         # --- spawning enemy calculations ---
         self.set_new_objective()
+
+    def set_enemy_stats(self, health, speed, damage, value, texture_name):
+        self.health = health
+        self.speed = speed
+        self.damage = damage
+        self.value = value
+        self.texture_name = texture_name
 
     def set_new_objective(self):
         positions: list[list[int, int]] = []

@@ -29,13 +29,13 @@ class ScreenManager:
         self.scaled_textures[name.lower()] = pygame.transform.scale(texture, new_size)
 
     def pixel_blit(self, x: int, y: int, texture_name: str):
-        self.screen_surface.blit(self.scaled_textures[texture_name], [int(x)*self.pixel_size, int(y)*self.pixel_size])
+        self.screen_surface.blit(self.scaled_textures[texture_name.lower()], [int(x)*self.pixel_size, int(y)*self.pixel_size])
 
     def part_pixel_blit(self, x: float, y: float, texture_name: str):
-        self.screen_surface.blit(self.scaled_textures[texture_name], [int(x*self.pixel_size), int(y*self.pixel_size)])
+        self.screen_surface.blit(self.scaled_textures[texture_name.lower()], [int(x*self.pixel_size), int(y*self.pixel_size)])
 
     def absolute_pixel_blit(self, x: int, y: int, texture_name: str):
-        self.screen_surface.blit(self.scaled_textures[texture_name], [int(x), int(y)])
+        self.screen_surface.blit(self.scaled_textures[texture_name.lower()], [int(x), int(y)])
 
     def pixel_text_blit(self, x: int, y: int, text: str, size: int, color: tuple[int, int, int]):
         font = pygame.font.SysFont('arial', size*self.pixel_size)

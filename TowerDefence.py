@@ -1,8 +1,9 @@
-import pygame
 import random
-from ScreenManager import ScreenManager
+
 from Enemy import Enemy
+from ScreenManager import ScreenManager
 from Turret import Turret
+from WaveManager import WaveManager
 
 
 class Tile:
@@ -76,7 +77,6 @@ class MapManager:
 
         # --- pathfinding  ---
         self.default_path: list[list[any]] = [[-1 for _ in range(self.map_size[0])] for _ in range(self.map_size[1])]
-
 
     def fill_map(self, tile_name: str):
         """ fills the whole map with 1 type of tile
@@ -184,8 +184,8 @@ class PlaceableTile:
 
 
 class TowerDefence:
-    def __init__(self, x_size: int, y_size: int) -> None:
-        self.tm: TileManager = create_tileManager()
+    def __init__(self, x_size: int, y_size: int, tm: TileManager, placeables: list[PlaceableTile], wave_enemies) -> None:
+        self.tm: TileManager = tm
 
         # tiles map with type of tiles
         self.map: MapManager = MapManager(x_size, y_size, self.tm)
@@ -200,6 +200,7 @@ class TowerDefence:
         self.generate_utilities()  # setting random positions for the spawner and the base
 
         # objects
+        self.wave_manager = WaveManager(self, wave_enemies)
         self.enemies: list[Enemy] = []
         self.turret_custom_id = 0
         self.turrets: list[Turret] = []
@@ -210,8 +211,12 @@ class TowerDefence:
         self.placeable_tile_list_index = 0
         self.placeable_tile_list = []
         # --- placeable tiles ---
-
-        self.placeable_tile_list.append(PlaceableTile("stonewall_preview", 10, self.tm.get_tile("stonewall")))
+        for placeable in placeables:
+            if isinstance(placeable.type, Tile):
+                self.placeable_tile_list.append(placeable)
+            elif isinstance(placeable.type, Turret):
+                placeable.type.td = self
+                self.placeable_tile_list.append(placeable)
 
     def generate_utilities(self) -> None:
         """ creating and setting the spawner_pos and base_pos to a random position
@@ -227,24 +232,29 @@ class TowerDefence:
     def calculate_pathfinding(self):
         self.map.generate_default_path(self.base_pos[0], self.base_pos[1])
 
-    def add_enemy(self):
-        self.enemies.append(Enemy(self.map, self.spawner_pos[0], self.spawner_pos[1], 100, "skeleton"))
+    def add_enemy(self, health, speed, damage, value, texture_name):
+        en = Enemy(self.map, self.spawner_pos[0], self.spawner_pos[1], texture_name)
+        en.set_enemy_stats(health, speed, damage, value, texture_name)
+        self.enemies.append(en)
 
     def place_turret(self, x, y, custom_turret):
         tr = custom_turret.copy()
+        tr.position = [x*10, y*10]
         tr.turret_id = self.turret_custom_id
 
         self.turrets.append(tr)
-        self.map.set_tile(x, y, Tile("turret", tr.hardness, True, self.turret_custom_id))
+        self.map.set_tile(x, y, Tile(custom_turret.texture_name, tr.hardness, True, self.turret_custom_id))
         self.turret_custom_id += 1
 
     def place_placeable(self, x, y):
         if x < 0 or x >= self.map.map_size[0] or y < 0 or y >= self.map.map_size[1]:
             # out of bounds
+            print("out of bounds")
             return
 
-        if self.map.get_tile(x, y).texture_name != "empty":
+        if self.map.get_tile(x, y).texture_name != self.tm.get_tile("empty").texture_name:
             # not an empty place
+            print("non empty")
             return
 
         selected = self.placeable_tile_list[self.placeable_tile_list_index]
@@ -264,12 +274,19 @@ class TowerDefence:
         self.placeable_tile_list_index %= len(self.placeable_tile_list)
 
     def update(self, dt: float):
+        # wave management
+        self.wave_manager.update(dt)
+
         # turrets damage check
         for turret in self.turrets:
             tile_position = turret.position
             tile_position = [int(tile_position[0]/10), int(tile_position[1]/10)]
             if self.map.get_tile(tile_position[0], tile_position[1]).connected_turret_id != turret.turret_id:
+                print(self.map.get_tile(tile_position[0], tile_position[1]).connected_turret_id)
+                print(turret.turret_id)
+
                 self.turrets.remove(turret)
+
 
         # update turrets
         for turret in self.turrets:
@@ -280,6 +297,7 @@ class TowerDefence:
             enemy.update(dt)
 
             if enemy.health <= 0:
+                self.player_currency += enemy.value
                 self.enemies.remove(enemy)
 
         # damage base
@@ -318,6 +336,16 @@ class TowerDefence:
         sm.pixel_blit(1 * 10, self.map.map_size[1] * 10, selected.texture_name)
         color = (255, 255, 255) if selected.cost <= self.player_currency else (165, 24, 24)
         sm.pixel_micro_font(2 * 10, self.map.map_size[1] * 10 + 1, str(selected.cost).zfill(2), color)
+
+        # wave indicator
+        sm.pixel_blit(4 * 10, self.map.map_size[1] * 10, "ghost")  # skull/ghost
+
+        sm.pixel_micro_font(5 * 10, self.map.map_size[1] * 10 + 1, str(self.wave_manager.wave_number), (243, 226, 177))
+
+        if len(self.enemies) == 0 and self.wave_manager.time_between_waves_timer != 10:
+            timeleft = int(self.wave_manager.time_between_waves_timer)
+            color = (255, 0, 0) if timeleft % 2 == 0 else (127, 0, 0)
+            sm.pixel_micro_font(7 * 10, self.map.map_size[1] * 10 + 1, f"({timeleft})", color)
 
         # diamond image + player currency amount
         sm.pixel_blit((self.map.map_size[0]-3)*10, self.map.map_size[1]*10, "currency")  # money

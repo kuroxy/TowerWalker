@@ -5,11 +5,11 @@ from TowerDefence import MapManager
 
 
 class Player:
-    def __init__(self):
-        self.texture_name = "player"
+    def __init__(self, texture_name, speed, damage):
+        self.texture_name = texture_name
         self.position: list[float, float] = [0, 0]
-        self.SPEED: float = 50
-        self.damage = 1
+        self.speed: float = speed
+        self.damage = damage
 
         self.facing_direction: int = 0  # n e s w
         self.selected_tile_position: list[int, int] = None
@@ -72,8 +72,8 @@ class Player:
         if length != 0:
             direction[0] /= length
             direction[1] /= length
-            x_change = direction[0] * dt * self.SPEED
-            y_change = direction[1] * dt * self.SPEED
+            x_change = direction[0] * dt * self.speed
+            y_change = direction[1] * dt * self.speed
             self.position[0] += x_change
             self.position[1] += y_change
 

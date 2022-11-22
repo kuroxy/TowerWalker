@@ -4,7 +4,7 @@ from ScreenManager import ScreenManager
 
 
 class Turret:
-    def __init__(self, turret_id:int, position: list[int, int], t_range: float, damage: float, fire_rate: float, hardness: float, td):
+    def __init__(self, turret_id: int, position: list[int, int], t_range: float, damage: float, fire_rate: float, hardness: float, td, texture_name):
         self.turret_id = turret_id
 
         # --- turret stats ---
@@ -15,7 +15,8 @@ class Turret:
         self.fire_timer = self.fire_rate
         self.current_target = None
 
-        self.hardness= hardness
+        self.hardness = hardness
+        self.texture_name = texture_name
         # --- utility ---
         self.td = td
 
@@ -77,6 +78,6 @@ class Turret:
             sm.pixel_line(self.laser_color, self.laser_line, self.laser_thickness)
 
     def copy(self):
-        cop = Turret(self.turret_id, self.position, self.t_range, self.damage, self.fire_rate, self.td)
+        cop = Turret(self.turret_id, self.position, self.t_range, self.damage, self.fire_rate, self.hardness, self.td, self.texture_name)
         cop.set_drawing_vars(self.laser_thickness, self.laser_color, self.laser_show_time)
         return cop
