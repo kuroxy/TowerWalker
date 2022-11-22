@@ -1,3 +1,6 @@
+import os
+import sys
+
 import pygame
 from Player import Player
 from TowerDefence import *
@@ -37,7 +40,9 @@ sound_manager.load_sound("place_turret", "resources/sounds/place_turret.wav")
 sound_manager.load_sound("damage_base", "resources/sounds/damage_base.wav")
 
 # --- Load Music ---
-sound_manager.load_music("resources/music/Broken_Fragment.ogg")
+music_directory = "resources/music"
+for i in os.listdir(music_directory):
+    sound_manager.load_music(f"{music_directory}/{i}")
 
 
 # -----------------Game-------------------------
@@ -51,7 +56,7 @@ towerDef.calculate_pathfinding()
 
 mainPlayer.position = [towerDef.base_pos[0]*10, towerDef.base_pos[1]*10]
 sound_manager.set_music_volume(.01)
-sound_manager.play_next_track()
+sound_manager.play_random_track()
 # ---------------game loop-----------------------
 
 
@@ -79,6 +84,7 @@ while True:
         if event.type == pygame.QUIT:
 
             pygame.quit()
+            sys.exit()
 
         if event.type == SoundManager.NEXT_SONG:
             # sound_manager.play_next_track()

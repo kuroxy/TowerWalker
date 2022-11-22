@@ -138,10 +138,10 @@ class MapManager:
         for y in range(self.map_size[1]):
             for x in range(self.map_size[0]):
                 if self.damage_map[y][x] <= 0:
-                    if self.map[y][x] != self.tm.get_tile("empty"):
+                    if self.map[y][x] != self.tm.get_tile("empty") and self.map[y][x] != self.tm.get_tile("base") and self.map[y][x] != self.tm.get_tile("spawner"):
                         sound_m.play_sound("break_block")
-                    self.map[y][x] = self.tm.get_tile("empty")
-                    self.damage_map[y][x] = self.tm.get_tile("empty").difficulty
+                        self.map[y][x] = self.tm.get_tile("empty")
+                        self.damage_map[y][x] = self.tm.get_tile("empty").difficulty
 
     # --- pathfinding ---
 
