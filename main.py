@@ -75,7 +75,6 @@ def unpause_screen():
 
 paused = False
 game_over = False
-space_hold = False
 while True:
     dt = clock.tick(60) / 1000
     mouse_up_event = -1
@@ -108,16 +107,13 @@ while True:
                 mainPlayer.position = [towerDef.base_pos[0] * 10, towerDef.base_pos[1] * 10]
                 game_over = False
 
+            if event.key == pygame.K_SPACE and len(towerDef.wave_manager.wave_spawn_monster_list) == 0 and len(towerDef.enemies) == 0:
+                towerDef.wave_manager.time_between_waves_timer = 0
+
     if not paused and not game_over:
         # ------ Player Input --------
         keys = pygame.key.get_pressed()
         mouse_position = pygame.mouse.get_pos()
-
-        if keys[pygame.K_SPACE] and not space_hold:
-            towerDef.wave_manager.time_between_waves_timer = 0
-            space_hold = True
-        elif not keys[pygame.K_SPACE]:
-            space_hold = False
 
         mainPlayer.userinput(keys, mouse_up_event, dt, towerDef)
         mainPlayer.calculate_selected(screen_manager.screen_to_pixel(mouse_position), towerDef.map)

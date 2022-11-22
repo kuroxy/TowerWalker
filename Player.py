@@ -17,8 +17,8 @@ class Player:
         self.tile_size = 10
 
     def calculate_selected(self, mouse_pos, mm: MapManager):
-        difference_x = mouse_pos[0]-self.position[0]
-        difference_y = mouse_pos[1]-self.position[1]
+        difference_x = mouse_pos[0]-self.position[0]-5
+        difference_y = mouse_pos[1]-self.position[1]-5
         if abs(difference_x) > abs(difference_y):  # x is dominant
             self.facing_direction = 1 if difference_x > 0 else 3
 
@@ -79,7 +79,8 @@ class Player:
 
     def draw(self, sm: ScreenManager):
         sm.part_pixel_blit(self.position[0], self.position[1], self.texture_name)
-        sm.part_pixel_blit(self.selected_tile_position[0] * 10, self.selected_tile_position[1] * 10, "select")
+        if self.selected_tile:
+            sm.part_pixel_blit(self.selected_tile_position[0] * 10, self.selected_tile_position[1] * 10, "select")
 
     def collision_with_tile(self, mm: MapManager):
         small_x = math.floor((self.position[0]) / self.tile_size)
