@@ -53,12 +53,10 @@ health = 50
 speed = 3
 damage = 2
 value = 1
-
-[ENEMY]
-texture_name = "resources/textures/Skeleton.png"
-cost = 3
-health = 200
-speed = 2
-damage = 2
-value = 2
-
+start_scaling_wave = 8
+scaling_health = 2.5
+scaling_speed = 0.01
+scaling_damage = .05
+max_health = -1
+max_speed = 5
+max_damage = 5

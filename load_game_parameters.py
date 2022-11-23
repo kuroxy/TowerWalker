@@ -75,15 +75,24 @@ def parse_placeable_turret(lines, i, sm: ScreenManager, sound_m: SoundManager):
 
 
 def parse_enemy(lines, i, sm: ScreenManager):
-    texture_name = parse_string(lines[i+1])
-    cost = parse_int(lines[i+2])
-    health = parse_int(lines[i+3])
-    speed = parse_float(lines[i+4])
-    damage = parse_float(lines[i+5])
-    value = parse_float(lines[i+6])
-    sm.load_pixel_texture(texture_name, texture_name, True)
+    enemy_as_list: list = []
+    enemy_as_list.append(parse_string(lines[i+1]))  # texture_name
+    enemy_as_list.append(parse_int(lines[i+2]))  # cost
+    enemy_as_list.append(parse_int(lines[i+3]))  # health
+    enemy_as_list.append(parse_float(lines[i+4]))  # speed
+    damage = enemy_as_list.append(parse_float(lines[i+5]))  # damage
+    value = enemy_as_list.append(parse_float(lines[i+6]))  # value
+    enemy_as_list.append(parse_int(lines[i+7]))  # start_scaling_wave
+    enemy_as_list.append(parse_float(lines[i+8]))  # scaling_health
+    enemy_as_list.append(parse_float(lines[i+9]))  # scaling_speed
+    enemy_as_list.append(parse_float(lines[i+10]))  # scaling_damage
+    enemy_as_list.append(parse_float(lines[i+11]))  # max_health
+    enemy_as_list.append(parse_float(lines[i+12]))  # max_speed
+    enemy_as_list.append(parse_float(lines[i+13]))  # max_damage
+
+    sm.load_pixel_texture(enemy_as_list[0], enemy_as_list[0], True)
     # cost, health, speed, damage, value, texture_name
-    return [cost, health, speed, damage, value, texture_name]
+    return enemy_as_list
 
 
 def load_game(stat, sm: ScreenManager, sound_m: SoundManager):

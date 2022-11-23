@@ -248,9 +248,7 @@ class TowerDefence:
     def calculate_pathfinding(self):
         self.map.generate_default_path(self.base_pos[0], self.base_pos[1])
 
-    def add_enemy(self, health, speed, damage, value, texture_name):
-        en = Enemy(self.map, self.spawner_pos[0], self.spawner_pos[1], texture_name)
-        en.set_enemy_stats(health, speed, damage, value, texture_name)
+    def add_enemy(self, en):
         self.enemies.append(en)
 
     def place_turret(self, x, y, custom_turret):
@@ -345,6 +343,7 @@ class TowerDefence:
 
         for turret in self.turrets:
             turret.draw(sm)
+        sm.pixel_render()
 
         # player interface background
         for x in range(self.map.map_size[0]):
@@ -382,6 +381,6 @@ class TowerDefence:
 
         sm.pixel_micro_font(10*10, self.map.map_size[1] * 10 + 1, str(int(self.base_health)), color)
         # diamond image + player currency amount
-        sm.pixel_blit((self.map.map_size[0]-3)*10, self.map.map_size[1]*10, "currency")  # money
-        sm.pixel_micro_font((self.map.map_size[0]-2)*10+1, self.map.map_size[1]*10+1, str(self.player_currency).zfill(3), (95, 183, 243))
+        sm.pixel_blit((self.map.map_size[0]-4)*10, self.map.map_size[1]*10, "currency")  # money
+        sm.pixel_micro_font((self.map.map_size[0]-3)*10+1, self.map.map_size[1]*10+1, str(self.player_currency), (95, 183, 243))
 

@@ -58,10 +58,12 @@ class ScreenManager:
         return [int(position[0] / self.pixel_size), int(position[1] / self.pixel_size)]
 
     def pixel_line(self, color, line, width):
-        self.pixel_surface.fill((0, 0, 0))
         pygame.draw.line(self.pixel_surface, color, [line[0], line[1]], [line[2], line[3]], width)
+
+    def pixel_render(self):
         surf = pygame.transform.scale(self.pixel_surface, self.window_size)
         self.screen_surface.blit(surf, (0, 0))
+        self.pixel_surface.fill((0, 0, 0))
 
     def pixel_micro_font(self, x, y, text, color):
         if not self.micro_font:

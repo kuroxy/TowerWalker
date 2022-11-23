@@ -12,7 +12,7 @@ class Enemy:
         # --- Enemy stats ---
         self.position: list[float, float] = [0, 0]
 
-        self.health = 100
+        self.health: float = 100
         self.speed: float = 1
         self.damage: float = 5
 
@@ -25,12 +25,12 @@ class Enemy:
         # --- spawning enemy calculations ---
         self.set_new_objective()
 
-    def set_enemy_stats(self, health, speed, damage, value, texture_name):
+    def set_enemy_stats(self, texture_name, health, speed, damage, value):
+        self.texture_name = texture_name
         self.health = health
         self.speed = speed
         self.damage = damage
         self.value = value
-        self.texture_name = texture_name
 
     def set_new_objective(self):
         positions: list[list[int, int]] = []
