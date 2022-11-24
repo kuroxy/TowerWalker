@@ -11,8 +11,8 @@ class SoundManager:
         self.music = []
         self.current_music_track = 0
 
-        self.music_volume = 1
-        self.sound_volume = 1
+        self.music_volume = .5
+        self.sound_volume = .5
 
     def load_sound(self, name, path, default_volume=1):
         self.sounds[name.lower()] = [pygame.mixer.Sound(path), default_volume]

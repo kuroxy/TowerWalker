@@ -60,7 +60,6 @@ towerDef = TowerDefence(int(GAME_SIZE[0]/10), int(GAME_SIZE[1]/10)-1, parameters
 towerDef.calculate_pathfinding()
 
 mainPlayer.position = [towerDef.base_pos[0]*10, towerDef.base_pos[1]*10]
-sound_manager.set_music_volume(.01)
 sound_manager.play_random_track()
 # ---------------game loop-----------------------
 
