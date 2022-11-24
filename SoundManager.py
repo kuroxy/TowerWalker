@@ -11,14 +11,17 @@ class SoundManager:
         self.music = []
         self.current_music_track = 0
 
-    def load_sound(self, name, path):
-        self.sounds[name.lower()] = pygame.mixer.Sound(path)
+        self.music_volume = 1
+        self.sound_volume = 1
+
+    def load_sound(self, name, path, default_volume=1):
+        self.sounds[name.lower()] = [pygame.mixer.Sound(path), default_volume]
 
     def load_music(self, path):
         self.music.append(path)
 
     def play_sound(self, sound_name):
-        self.sounds[sound_name.lower()].play()
+        self.sounds[sound_name.lower()][0].play()
 
     def play_next_track(self):
         pygame.mixer.music.load(self.music[self.current_music_track])
@@ -35,7 +38,13 @@ class SoundManager:
         pygame.mixer.music.set_endevent(SoundManager.NEXT_SONG)
 
     def set_music_volume(self, volume: float):
+        self.music_volume = volume
         pygame.mixer.music.set_volume(volume)
+
+    def set_sound_volume(self, volume: float):
+        self.sound_volume = volume
+        for sound in self.sounds:
+            self.sounds[sound][0].set_volume(min(self.sounds[sound][1] * volume, 1.0))
 
     def pause_music(self):
         pygame.mixer.music.pause()

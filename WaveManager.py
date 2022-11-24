@@ -71,7 +71,7 @@ class WaveManager:
 
     def generate_new_wave(self, wave_number):
         self.spawn_speed = max(.05, self.spawn_speed-.009)
-        monster_spawn_currency = round(.4*pow(wave_number, 1.4)+1)
+        monster_spawn_currency = round(.4*pow(wave_number, 1.4)+1)  # spawn currency old v max((wave_number-5)*2, 1)
         monster_spawn_list = []
         while monster_spawn_currency > 0:
             random_monster = random.choice(self.get_monster_list(monster_spawn_currency))

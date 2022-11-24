@@ -4,7 +4,6 @@ import sys
 import pygame
 from Player import Player
 from TowerDefence import *
-from Player import Player
 from load_game_parameters import load_game
 from SoundManager import SoundManager
 
@@ -25,6 +24,12 @@ clock = pygame.time.Clock()
 # -------------- Load Textures ---------------
 
 # ---utility---
+screen_manager.load_pixel_texture("resources/textures/Line.png", "line", True)
+screen_manager.load_pixel_texture("resources/textures/Bar.png", "bar", True)
+
+screen_manager.load_pixel_texture("resources/textures/Music.png", "music_icon", True)
+screen_manager.load_pixel_texture("resources/textures/Sounds.png", "sound_icon", True)
+
 screen_manager.load_pixel_texture("resources/textures/Ghost.png", "ghost", True)
 screen_manager.load_pixel_texture("resources/textures/Arrows.png", "arrows", True)
 screen_manager.load_pixel_texture("resources/textures/Select.png", "select", True)
@@ -73,11 +78,30 @@ def unpause_screen():
     sound_manager.unpause_music()
 
 
+def draw_soundbars(sm: ScreenManager):
+    sm.pixel_rect((13, 7, 3), 10, 13, 32, 4)
+    sm.pixel_blit(0, 10, "music_icon")
+    sm.pixel_blit(10, 10, "line")
+    sm.pixel_blit(20, 10, "line")
+    sm.pixel_blit(30, 10, "line")
+
+    sm.pixel_rect((13, 7, 3), 10, 33, 32, 4)
+    sm.pixel_blit(0, 30, "sound_icon")
+    sm.pixel_blit(10, 30, "line")
+    sm.pixel_blit(20, 30, "line")
+    sm.pixel_blit(30, 30, "line")
+
+    sm.pixel_blit(10 + sound_manager.music_volume * 30, 10, "bar")
+    sm.pixel_blit(10 + sound_manager.sound_volume * 30, 30, "bar")
+
+
 paused = False
 game_over = False
 while True:
     dt = clock.tick(60) / 1000
     mouse_up_event = -1
+    keys = pygame.key.get_pressed()
+    mouse_position = pygame.mouse.get_pos()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -109,11 +133,21 @@ while True:
 
             if event.key == pygame.K_SPACE and len(towerDef.wave_manager.wave_spawn_monster_list) == 0 and len(towerDef.enemies) == 0:
                 towerDef.wave_manager.time_between_waves_timer = 0
+    if paused:
+        draw_soundbars(screen_manager)
+        if pygame.mouse.get_pressed()[0]:
+            if 5 * screen_manager.pixel_size < mouse_position[0] < 45 * screen_manager.pixel_size:
+                volume = min(max((mouse_position[0] / screen_manager.pixel_size - 10) / 30, 0), 1)
+                if abs(mouse_position[1]-150) < 20:  # top bar
+
+                    sound_manager.set_music_volume(volume)
+
+                if abs(mouse_position[1]-350) < 20:  # top bar
+
+                    sound_manager.set_sound_volume(volume)
 
     if not paused and not game_over:
         # ------ Player Input --------
-        keys = pygame.key.get_pressed()
-        mouse_position = pygame.mouse.get_pos()
 
         mainPlayer.userinput(keys, mouse_up_event, dt, towerDef)
         mainPlayer.calculate_selected(screen_manager.screen_to_pixel(mouse_position), towerDef.map)

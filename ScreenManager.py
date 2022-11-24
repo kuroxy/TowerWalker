@@ -60,6 +60,11 @@ class ScreenManager:
     def pixel_line(self, color, line, width):
         pygame.draw.line(self.pixel_surface, color, [line[0], line[1]], [line[2], line[3]], width)
 
+    def draw_line(self, color, line, width):
+        pygame.draw.line(self.screen_surface, color, [line[0], line[1]], [line[2], line[3]], width)
+
+    def pixel_rect(self, color, x, y, width, height):
+        pygame.draw.rect(self.screen_surface, color, [x*self.pixel_size, y*self.pixel_size, width*self.pixel_size, height*self.pixel_size])
     def pixel_render(self):
         surf = pygame.transform.scale(self.pixel_surface, self.window_size)
         self.screen_surface.blit(surf, (0, 0))
